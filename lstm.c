@@ -3,7 +3,7 @@ static inline void node_lstm0( const float X[10][1][1], const float W[1][128][1]
    /* LSTM 
     * inputs: 
     *   X = tensor_input
-    *   W = tensor_W0
+    *   W = tensor_W0w
     *   R = tensor_R0
     *   B = tensor_B0
     *   sequence_lens = 

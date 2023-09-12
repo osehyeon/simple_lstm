@@ -61,10 +61,11 @@ def generate_model(rnn_type, input_dim, hidden_dim, bidirectional, layers, model
     onnx.save(model, model_name)
 
 # rnn_type, input_dim, hidden_dim, bidirectional,  layers,   model_name, batch_one=True,  has_seq_len=False, s_len=1
-generate_model("lstm", 128, 32, False, 1, "model.onnx", True, False, 1)
+generate_model("lstm", 1, 20, False, 1, "model.onnx", True, True, 10)
 
-input = np.random.rand(1, 1, 128).astype(np.float32)
 
+input = np.random.rand(10, 1, 1).astype(np.float32)
+seq_len_input = np.array([10], dtype=np.int32)  # 모델의 시퀀스 길이가 10이므로
 # Convert the Numpy array to a TensorProto
 tensor = numpy_helper.from_array(input)
 
@@ -74,7 +75,8 @@ with open('test_data_set_0/input_0.pb', 'wb') as f:
 
 # with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
 sess = onnxruntime.InferenceSession("model.onnx")
-result = sess.run(["reshaped_output_0"], {'input': input.astype(np.float32)})
+result = sess.run(["reshaped_output_0"], {'input': input.astype(np.float32), 'seq_len': seq_len_input})
+#result = sess.run(["reshaped_output_0"], {'input': input.astype(np.float32)})
 print("ONNX Runtime")
 print(np.asarray(result[0]))
 
