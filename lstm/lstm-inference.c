@@ -1,6 +1,6 @@
 #include <stdio.h>
-//#include <math.h>
-#include "lstm-weight-update.c"
+#include <math.h>
+#include "lstm-onnx-module-10.c"
 
 // Define constants
 #define PI 3.14159265358979323846
@@ -23,7 +23,7 @@ int main() {
 
     // Print the result
     for(int i=0; i<10; i++) {
-        printf("Result: %f\n", Y_h[0][i]);
+        printf("Result: %f\n", Y_h[0][0][i]);
     }
     
     return 0;
