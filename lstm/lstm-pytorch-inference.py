@@ -22,5 +22,5 @@ ort_inputs = {ort_session.get_inputs()[0].name: inputs}
 ort_outs = ort_session.run(None, ort_inputs)
 predictions = np.array(ort_outs).squeeze()
 
-print(f"Input Data: {inputs.squeeze()}")
+#print(f"Input Data: {inputs.squeeze()}")
 print(f"Predictions: {predictions}")
