@@ -5,7 +5,7 @@ import onnxruntime as ort
 PI = 3.14159265358979323846
 
 # 1. onnxruntime 세션 생성하기
-ort_session = ort.InferenceSession("lstm-pytorch-10-1.onnx")
+ort_session = ort.InferenceSession("lstm-pytorch-10.onnx")
 
 # 2. 예측 및 검증을 위한 데이터 생성하기
 def generate_data():
@@ -19,7 +19,7 @@ def generate_data():
 
 inputs = generate_data()
 
-print(inputs)
+#print(inputs)
 # ONNX 모델을 사용하여 예측하기
 ort_inputs = {ort_session.get_inputs()[0].name: inputs}
 ort_outs = ort_session.run(None, ort_inputs)
