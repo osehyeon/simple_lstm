@@ -58,103 +58,190 @@ float tensor_Y[10][1][1][1];
 };
 static union tensor_union_0 tu0;
 
+void forget_gate(float X[1][1][1], float W[1][1][1], float R[1][1][1], float B[1][1], float Y_h[1][1][1], float ft[1][1]){
+    
+    const int hs = 1;
+    const int ds = 1;
+    const int bs = 1;
 
-static inline void node_anonymous_LSTM_0( const float X[10][1][1], const float W[1][4][1], const float R[1][4][1], const float B[1][8], float Y[10][1][1][1], float Y_h[1][1][1], float Y_c[1][1][1] )
-{
-	/* LSTM 
-	 * inputs: 
-	 *   X = tensor_X
-	 *   W = tensor_W
-	 *   R = tensor_R
-	 *   B = tensor_B
-	 *   sequence_lens = 
-	 *   initial_h = 
-	 *   initial_c = 
-	 *   P = 
-	 * outputs: 
-	 *   Y = tensor_Y
-	 *   Y_h = tensor_Y_h
-	 *   Y_c = tensor_Y_c
-	 * attributes:
-	 *   activations: Sigmoid Tanh Tanh 
-	 * clip: off
-	 * layout: 0
-	 * (rest TBD):
-	 */
-	int hs = 1;
-	int ds = 1;
-	int bs = 1;
-	int iidx = 0;
-	int oidx = hs;
-	int fidx = 2*hs;
-	int cidx = 3*hs;
-	int Rb = 4*hs;
-	int sequence_lenght = 10;
-	/* Forget gate */
-	float ft[bs][hs];
-	/* Input gate */
-	float it[bs][hs];
-	/* Cell gate */
-	float ct[bs][hs];
-	/* Output gate */
-	float ot[bs][hs];
+    memset(ft, 0, sizeof(*ft));
 
-	memset(Y_h, 0, sizeof(*Y_h));
-	memset(Y_c, 0, sizeof(*Y_c));
-
-	for( int s=0; s<sequence_lenght; s++) {
-
-		/* Forward lane */
-		for( int b=0; b<bs; b++)
-		for( int h=0; h<hs; h++) {
-			ft[b][h]=0;
-			it[b][h]=0;
-			ct[b][h]=0;
-			for( int i=0; i<ds; i++) {
-				ft[b][h] += X[s][b][i]*W[0][fidx+h][i];
-				it[b][h] += X[s][b][i]*W[0][iidx+h][i];
-				ct[b][h] += X[s][b][i]*W[0][cidx+h][i];
-			}
-			for( int k=0; k<hs; k++) {
-				ft[b][h] += Y_h[0][b][k]*R[0][fidx+h][k];
-				ct[b][h] += Y_h[0][b][k]*R[0][cidx+h][k];
-				it[b][h] += Y_h[0][b][k]*R[0][iidx+h][k];
-			}
-			ft[b][h] += B[0][fidx+h];
-			ft[b][h] += B[0][Rb+fidx+h];
-			it[b][h] += B[0][iidx+h];
-			it[b][h] += B[0][Rb+iidx+h];
-			ct[b][h] += B[0][cidx+h];
-			ct[b][h] += B[0][Rb+cidx+h];
-			ft[b][h] =1.0f/(1+expf(-ft[b][h]));
-			it[b][h] =1.0f/(1+expf(-it[b][h]));
-			ct[b][h] =tanh(ct[b][h]);
-		}
-		for( int b=0; b<bs; b++)
-		for( int h=0; h<hs; h++) {
-			/* Cell state */
-			Y_c[0][b][h] = Y_c[0][b][h]*ft[b][h] + it[b][h]*ct[b][h];
-			/* Output gate */
-			ot[b][h]=0;
-			for( int i=0; i<ds; i++)
-				ot[b][h] += X[s][b][i]*W[0][oidx+h][i];
-			for( int k=0; k<hs; k++)
-				ot[b][h] += Y_h[0][b][k]*R[0][oidx+h][k];
-			ot[b][h] += B[0][oidx+h];
-			ot[b][h] += B[0][Rb+oidx+h];
-			ot[b][h] =1.0f/(1+expf(-ot[b][h]));
-		}
-		/* Hidden state */
-		for( int b=0; b<bs; b++)
-		for( int h=0; h<hs; h++) {
-			Y_h[0][b][h] = ot[b][h] * tanh(Y_c[0][b][h]);
-			Y[s][0][b][h]= Y_h[0][b][h];
-		}
-
-	} /* sequences */
+    for(int b=0; b<bs; b++)
+    for(int h=0; h<hs; h++) {
+        ft[b][h]= 0;
+        for(int i=0; i<ds; i++) {
+            ft[b][h] += X[0][b][i]*W[0][h][i];
+        }
+        for(int k=0; k<hs; k++) {
+            ft[b][h] += Y_h[0][b][k]*R[0][h][k];
+        }
+        ft[b][h] += B[0][h];
+        ft[b][h] = sigmoid(ft[b][h]);
+    }
 }
 
+void input_gate(float X[1][1][1], float W[1][1][1], float R[1][1][1], float B[1][1], float Y_h[1][1][1], float it[1][1]){
+    
+    const int hs = 1;
+    const int ds = 1;
+    const int bs = 1;
+
+    memset(it, 0, sizeof(*it));
+
+    for(int b=0; b<bs; b++)
+    for(int h=0; h<hs; h++) {
+        it[b][h]= 0;
+        for(int i=0; i<ds; i++) {
+            it[b][h] += X[0][b][i]*W[0][h][i];
+        }
+        for(int k=0; k<hs; k++) {
+            it[b][h] += Y_h[0][b][k]*R[0][h][k];
+        }
+        it[b][h] += B[0][h];
+        it[b][h] = sigmoid(it[b][h]);
+    }
+}
+
+void update_gate(float X[1][1][1], float W[1][1][1], float R[1][1][1], float B[1][1], float Y_h[1][1][1], float ct[1][1]){
+    
+    const int hs = 1;
+   const int ds = 1;
+   const int bs = 1;
+
+    memset(ct, 0, sizeof(*ct));
+
+    for(int b=0; b<bs; b++)
+    for(int h=0; h<hs; h++) {
+        ct[b][h]= 0;
+        for(int i=0; i<ds; i++) {
+            ct[b][h] += X[0][b][i]*W[0][h][i];
+        }
+        for(int k=0; k<hs; k++) {
+            ct[b][h] += Y_h[0][b][k]*R[0][h][k];
+        }
+        ct[b][h] += B[0][h];
+        ct[b][h] = tan_h(ct[b][h]);
+    }
+}
+
+void output_gate(float X[1][1][1], float W[1][1][1], float R[1][1][1], float B[1][1], float Y_h[1][1][1], float ot[1][1]){
+    
+    const int hs = 1;
+    const int ds = 1;
+    const int bs = 1;
+
+    memset(ot, 0, sizeof(*ot));
+
+    for(int b=0; b<bs; b++)
+    for(int h=0; h<hs; h++) {
+        ot[b][h]= 0;
+        for(int i=0; i<ds; i++) {
+            ot[b][h] += X[0][b][i]*W[0][h][i];
+        }
+        for(int k=0; k<hs; k++) {
+            ot[b][h] += Y_h[0][b][k]*R[0][h][k];
+        }
+        ot[b][h] += B[0][h];
+        ot[b][h] = sigmoid(ot[b][h]);
+    }
+}
+
+void cell_state(float ft[1][10], float it[1][1], float ct[1][1], float Y_c[1][1][1]) {
+    const int hs = 1;
+    const int ds = 1;
+    const int bs = 1;
+
+    for( int b=0; b<bs; b++)
+    for( int h=0; h<hs; h++) {
+        Y_c[0][b][h] = Y_c[0][b][h]*ft[b][h] + it[b][h]*ct[b][h];
+    }
+}
+
+void output(float ot[1][1],  float Y_h[1][1][1], float Y_c[1][1][1]) {
+    const int hs = 1;
+    const int ds = 1;
+    const int bs = 1;
+    
+    for( int b=0; b<bs; b++)
+      for( int h=0; h<hs; h++) {
+         Y_h[0][b][h] = ot[b][h] * tan_h(Y_c[0][b][h]);
+      }
+}
 
 void entry(const float tensor_X[10][1][1], float tensor_Y_h[1][1][1]) {
-	node_anonymous_LSTM_0( tensor_X, tensor_W, tensor_R, tensor_B, tu0.tensor_Y, tensor_Y_h, tensor_Y_c);
+/*    
+    int hs = 128;
+   int ds = 1;
+   int bs = 1;
+    int iidx = 0;
+   int oidx = hs;
+   int fidx = 2*hs;
+   int cidx = 3*hs;
+*/
+
+    float X[1][1][1];
+
+    float Wf[1][1][1];
+    float Wi[1][1][1];
+    float Wu[1][1][1];
+    float Wo[1][1][1];
+
+    memcpy(Wi, &tensor_W[0][0], sizeof(float) * 1);
+    memcpy(Wo, &tensor_W[0][1], sizeof(float) * 1);
+    memcpy(Wf, &tensor_W[0][2], sizeof(float) * 1);
+    memcpy(Wu, &tensor_W[0][3], sizeof(float) * 1);
+
+    float Rf[1][1][1];
+    float Ri[1][1][1];
+    float Ru[1][1][1];
+    float Ro[1][1][1];
+
+    memcpy(Ri, &tensor_R[0][0], sizeof(float) * 1 * 1);
+    memcpy(Ro, &tensor_R[0][1], sizeof(float) * 1 * 1);
+    memcpy(Rf, &tensor_R[0][2], sizeof(float) * 1 * 1);
+    memcpy(Ru, &tensor_R[0][3], sizeof(float) * 1 * 1);
+
+    float Bf[1][1];
+    float Bi[1][1];
+    float Bu[1][1];
+    float Bo[1][1];
+    float temp_B[1][1];
+
+    memcpy(Bi, &tensor_B[0][0], sizeof(float) * 1);
+    memcpy(temp_B, &tensor_B[0][4], sizeof(float) * 1);
+    for(int i = 0; i < 1; i++) {
+        Bi[0][i] += temp_B[0][i];
+    }
+    memcpy(Bo, &tensor_B[0][1], sizeof(float) * 1);
+    memcpy(temp_B, &tensor_B[0][5], sizeof(float) * 1);
+    for(int i = 0; i < 1; i++) {
+        Bo[0][i] += temp_B[0][i];
+    }
+    memcpy(Bf, &tensor_B[0][2], sizeof(float) * 1);
+    memcpy(temp_B, &tensor_B[0][6], sizeof(float) * 1);
+    for(int i = 0; i < 1; i++) {
+        Bf[0][i] += temp_B[0][i];
+    }
+    memcpy(Bu, &tensor_B[0][3], sizeof(float) * 1);
+    memcpy(temp_B, &tensor_B[0][7], sizeof(float) * 1);
+    for(int i = 0; i < 1; i++) {
+        Bu[0][i] += temp_B[0][i];
+    }
+    
+    float ft[1][1] = {0};
+    float it[1][1] = {0};
+    float ct[1][1] = {0};
+    float ot[1][1] = {0};
+
+    for( int s=0; s<10; s++) {
+        memcpy(X, &tensor_X[s], sizeof(float) * 1 * 1);
+
+        forget_gate(X, Wf, Rf, Bf, tensor_Y_h, ft);
+        input_gate(X, Wi, Ri, Bi, tensor_Y_h, it);
+        update_gate(X, Wu, Ru, Bu, tensor_Y_h, ct);
+        output_gate(X, Wo, Ro, Bo, tensor_Y_h, ot);
+        cell_state(ft, it, ct, tensor_Y_c);
+        output(ot, tensor_Y_h, tensor_Y_c);
+    }
+    
 }
