@@ -24,3 +24,4 @@ predictions = np.array(ort_outs).squeeze()
 
 #print(f"Input Data: {inputs.squeeze()}")
 print(f"Predictions: {predictions}")
+f

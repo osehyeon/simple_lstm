@@ -50,6 +50,35 @@ TensorY entry(float tensor_X[10][1][1],
         ct = update_gate(X, Wu, Ru, Bu, Y_h);
         Y_c = cell_state(ft, it, ct, Y_c);
         Y_h = output(ot, Y_c, Y_h);
+        /*
+        if(s == 0)
+        {
+            for(int i=0; i<10; i++)
+            {
+                printf("it : %f \n", it.data[0][i]);
+            }
+            for(int i=0; i<10; i++)
+            {
+                printf("ot : %f \n", ot.data[0][i]);
+            }
+            for(int i=0; i<10; i++)
+            {
+                printf("ft : %f \n", ft.data[0][i]);
+            }
+            for(int i=0; i<10; i++)
+            {
+                printf("ct : %f \n", ct.data[0][i]);
+            }
+            for(int i=0; i<10; i++)
+            {
+                printf("Y_c : %f \n", Y_c.data[0][0][i]);
+            }
+            for(int i=0; i<10; i++)
+            {
+                printf("Y_h : %f \n", Y_h.data[0][0][i]);
+            }
+        }
+        */
     }
 
     return Y_h;
