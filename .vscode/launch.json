@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/KHJ/Desktop/Project/LSTM_IP",
-      "program": "c:/Users/KHJ/Desktop/Project/LSTM_IP/build/Debug/outDebug",
+      "cwd": "c:/Users/KHJ/Desktop/SimpleLSTM",
+      "program": "c:/Users/KHJ/Desktop/SimpleLSTM/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
