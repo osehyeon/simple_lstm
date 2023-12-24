@@ -4,7 +4,7 @@ import os
 
 dir_path = './Model/'
 
-file_name = 'lstm_dehs_epoch1_hidden128_v1.h5'
+file_name = 'DEH_epoch1_128_model0.h5'
 
 # 모델 불러오기
 model = load_model(dir_path + file_name)
@@ -16,7 +16,7 @@ if not os.path.exists(save_dir):
 
 # 모델의 레이어 이름을 리스트로 저장
 # 이미지에 표시된 레이어 이름에 따라 이 부분을 수정하세요.
-layer_names = ['lstm_8', 'lstm_9', 'lstm_10', 'lstm_11']
+layer_names = ['lstm_4', 'lstm_5', 'lstm_6', 'lstm_7']
 
 # 각 레이어의 가중치를 추출하고 .npy 파일로 저장
 for layer_index, layer_name in enumerate(layer_names, start=1):

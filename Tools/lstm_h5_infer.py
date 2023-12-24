@@ -4,7 +4,7 @@ import numpy as np
 # h5 모델 파일 경로
 
 dir_path = './Model/'
-file_name = 'lstm_dehs_epoch1_hidden128_v1.h5'
+file_name = 'DEH_epoch1_128_model0.h5'
 model_path = dir_path + file_name
 
 # 모델 로드

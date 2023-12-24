@@ -6,20 +6,24 @@ typedef struct {
 } Tensor; 
 
 
-Tensor compute_gate(float X[1][1][1], float W[1][128][1], float R[1][128][128], float B[1][128], Tensor Y_h, int STEPS)
+Tensor compute_gate(float X[1][1][128], float W[1][128][1], float R[1][128][128], float B[1][128], Tensor Y_h, int FEATURES, int STEPS)
 // gate 연산 모듈 
 {
     const int hs = 128;
+    const int fs = 128;
 
     Tensor gate = {{{0}}};
     for(int h=0; h<hs; h++)
     {   
         if(h >= STEPS) break;
 
-        gate.data[0][0][h] += X[0][0][0] * W[0][h][0];
-        
-        for(int k=0; k<hs; k++)
-        {
+        for(int d=0; d<fs; d++) {
+            if(d >= FEATURES) break;
+
+            gate.data[0][0][h] += X[0][0][d] * W[0][h][0];
+        }
+
+        for(int k=0; k<hs; k++) {
             if (k >= STEPS) break;
 
             gate.data[0][0][h] += Y_h.data[0][0][k] * R[0][h][k];
