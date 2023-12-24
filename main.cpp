@@ -5,7 +5,7 @@
 #include "WeightResize.cpp"
 //  128 -> LSTM32 -> LSTM64 -> LSTM128 -> LSTM32 -> LSTM64 -> LSTM1
 
-Tensor LSTM(Tensor tensor_X, float tensor_W[1][512][1],  float tensor_R[1][512][128], float tensor_B[1][1024], int FEATURES, int I_STEPS, int O_STEPS);
+Tensor LSTM(Tensor tensor_X, float tensor_W[1][512][1],  float tensor_R[1][512][128], float tensor_B[1][1024], int I_STEPS, int O_STEPS);
 int tensor_X_resize(const char *file_path, Tensor *tensor);
 void create_file_path(char *dir, char *file_name, char *full_path);
 int main() 
@@ -104,10 +104,10 @@ int main()
     tensor_X_resize(tensor_X_128, &tensor_X);
     
     // LSTM 연산 진행 (16, 16, 16, 1)
-    tensor_X = LSTM(tensor_X, tensor_W_1_16, tensor_R_1_16, tensor_B_1_16, 1, 128, 16);
-    tensor_X = LSTM(tensor_X, tensor_W_2_16, tensor_R_2_16, tensor_B_2_16, 1, 16, 16);
-    tensor_X = LSTM(tensor_X, tensor_W_3_16, tensor_R_3_16, tensor_B_3_16, 1, 16, 16);
-    tensor_X = LSTM(tensor_X, tensor_W_4_1, tensor_R_4_1, tensor_B_4_1, 1, 16, 1);
+    tensor_X = LSTM(tensor_X, tensor_W_1_16, tensor_R_1_16, tensor_B_1_16, 128, 16);
+    tensor_X = LSTM(tensor_X, tensor_W_2_16, tensor_R_2_16, tensor_B_2_16, 16, 16);
+    tensor_X = LSTM(tensor_X, tensor_W_3_16, tensor_R_3_16, tensor_B_3_16, 16, 16);
+    tensor_X = LSTM(tensor_X, tensor_W_4_1, tensor_R_4_1, tensor_B_4_1, 16, 1);
     //tensor_X = compute_sigmoid(tensor_X, 1);
 
     // 추론 결과 출력 (0에 가까우면 정상, 1에 가까우면 비정상)
@@ -118,7 +118,7 @@ int main()
 }
 
 
-Tensor LSTM(Tensor tensor_X, float tensor_W[1][512][1],  float tensor_R[1][512][128], float tensor_B[1][1024], int FEATURES, int I_STEPS, int O_STEPS) 
+Tensor LSTM(Tensor tensor_X, float tensor_W[1][512][1],  float tensor_R[1][512][128], float tensor_B[1][1024], int I_STEPS, int O_STEPS) 
 // LSTM Ops 파일의 핵심 연산 모듈을 바탕으로 LSTM 연산을 구현하는 코드 
 {
     // 내부 가중치 정의 (weight, Recurrence Weight, Bias) 中 (Input, Output, Forget, Update) 
@@ -150,7 +150,7 @@ Tensor LSTM(Tensor tensor_X, float tensor_W[1][512][1],  float tensor_R[1][512][
     Tensor ct = {{{0}}};
 
     // 입력 데이터 변수 정의 
-    float X[1][1][128]= {{{0}}};
+    float X[1][1][1]= {{{0}}};
 
     // LSTM 연산 진행 
     for(int s=0; s<128; s++) {
@@ -159,16 +159,16 @@ Tensor LSTM(Tensor tensor_X, float tensor_W[1][512][1],  float tensor_R[1][512][
         }
         X[0][0][0] = tensor_X.data[0][0][s];
 
-        it = compute_gate(X, Wi, Ri, Bi, Y_h, FEATURES, O_STEPS);
+        it = compute_gate(X, Wi, Ri, Bi, Y_h, O_STEPS);
         it = compute_sigmoid(it, O_STEPS);
 
-        ot = compute_gate(X, Wo, Ro, Bo, Y_h, FEATURES, O_STEPS);
+        ot = compute_gate(X, Wo, Ro, Bo, Y_h, O_STEPS);
         ot = compute_sigmoid(ot, O_STEPS);
 
-        ft = compute_gate(X, Wf, Rf, Bf, Y_h, FEATURES, O_STEPS);
+        ft = compute_gate(X, Wf, Rf, Bf, Y_h, O_STEPS);
         ft = compute_sigmoid(ft, O_STEPS);
 
-        ct = compute_gate(X, Wu, Ru, Bu, Y_h, FEATURES, O_STEPS);
+        ct = compute_gate(X, Wu, Ru, Bu, Y_h, O_STEPS);
         ct = compute_tanh(ct, O_STEPS);
 
         Y_c = compute_cell_state(ft, it, ct, Y_c, O_STEPS);
