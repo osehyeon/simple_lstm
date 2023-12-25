@@ -85,25 +85,32 @@ Tensor compute_hidden_state(Tensor A3, Tensor Y_c, Tensor Y_h, int STEPS)
     return Y_h;
 }
 
-Tensor compute_hard_sigmoid(Tensor gate, int STEPS) 
-// hard_sigmoid 연산 모듈
-{
-    const int hs = 128;
-    const float alpha = 0.2f;
-    const float beta = 0.5f;
-
-    for(int h = 0; h < hs; h++)
-    {
-        if (h >= STEPS) break;
-
-        // hard sigmoid 연산: max(0, min(1, alpha * x + beta))
-        float x = gate.data[0][0][h];
-        float hard_sig = alpha * x + beta;
-        hard_sig = (hard_sig < 0.0f) ? 0.0f : hard_sig; // max(0, ...)
-        hard_sig = (hard_sig > 1.0f) ? 1.0f : hard_sig; // min(1, ...)
-
-        gate.data[0][0][h] = hard_sig;
-    }
+void affine_matmul(float * C, float * A, float * B, float * d, int outrows, int outcols, int innerdim) {                 
     
-    return gate;
+    memset(C, 0, outrows*outcols*sizeof(C[0]));
+    for (int i = 0 ; i < outrows; ++i) {
+        int outrowidx = i*outcols;
+        int inneridx = i*innerdim;
+        for (int j = 0;  j < outcols; ++j) {
+            for (int k = 0; k < innerdim; ++k) {
+                C[outrowidx+j] += A[inneridx+k] * B[k*outcols+j];
+            }
+            C[outrowidx+j] += d[j];
+        }
+    }
+}
+
+void sigmoid_func(float * x, int size) {
+	for (int i=0; i < size; ++i) {
+	  x[i] = 1/(1+expf(-x[i]));
+  }
+}
+
+void relu_func(float * x, int size) {
+
+    for (int i=0; i < size; ++i) {
+        if (x[i] <= 0.0f) {
+            x[i] = 0.0f;
+        }
+    }
 }

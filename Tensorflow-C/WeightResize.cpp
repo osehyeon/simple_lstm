@@ -22,7 +22,7 @@ void tensor_W_resize(const char *file_path, float array[1][512][1], int STEPS) {
 
 }
 
-void tensor_R_resize(const char *file_path, float tensor_W[1][512][128], int STEPS) {
+void tensor_R_resize(const char *file_path, float array[1][128][512], int STEPS) {
 // Recurrence Weights 텍스트 파일을 읽어와 배열에 저장하는 코드 
     FILE *file;
     int count = 0;
@@ -32,18 +32,16 @@ void tensor_R_resize(const char *file_path, float tensor_W[1][512][128], int STE
         perror("Error opening file");
     }
 
-    while (fscanf(file, "%f", &tensor_W[0][count / STEPS][count % STEPS]) == 1) {
+    while (fscanf(file, "%f", &array[0][count / (STEPS * 4)][count % (STEPS * 4)]) == 1) {
         count++;
         if (count >= 4 * STEPS * STEPS) { 
             break;
         }
     }
-
     fclose(file);
-
 }
 
-void tensor_B_resize(const char *file_path, float array[1][1024], int STEPS) {
+void tensor_B_resize(const char *file_path, float array[1][512], int STEPS) {
 // Bias 텍스트 파일을 읽어와 배열에 저장하는 코드 
     FILE *file;
     int count = 0;
@@ -55,7 +53,7 @@ void tensor_B_resize(const char *file_path, float array[1][1024], int STEPS) {
 
     while (fscanf(file, "%f", &array[0][count]) == 1) {
         count++;
-        if (count >= 4 * 2 * STEPS) {
+        if (count >= 4 * STEPS) {
             break;
         }
     }
@@ -64,22 +62,43 @@ void tensor_B_resize(const char *file_path, float array[1][1024], int STEPS) {
 
 }
 
-int read_data_from_file(const char *filename, float *data) {
+void tensor_DW_resize(const char *file_path, float array[1][128][128], int I_STEPS, int O_STEPS) {
+// Recurrence Weights 텍스트 파일을 읽어와 배열에 저장하는 코드 
     FILE *file;
     int count = 0;
 
-    // 파일 열기
-    file = fopen(filename, "r");
+    file = fopen(file_path, "r");
     if (file == NULL) {
-        perror("파일 열기 실패");
-        return -1; // 파일 열기 실패
+        perror("Error opening file");
     }
 
-    // 파일에서 데이터 읽기
-    while (fscanf(file, "%f", &data[count]) == 1) {
+    while (fscanf(file, "%f", &array[0][count / (O_STEPS)][count % (O_STEPS)]) == 1) {
         count++;
+        if (count >= I_STEPS * O_STEPS) { 
+            break;
+        }
     }
     fclose(file);
-
-    return 0;
 }
+
+void tensor_DB_resize(const char *file_path, float array[1][128], int STEPS) {
+// Bias 텍스트 파일을 읽어와 배열에 저장하는 코드 
+    FILE *file;
+    int count = 0;
+
+    file = fopen(file_path, "r");
+    if (file == NULL) {
+        perror("Error opening file");
+    }
+
+    while (fscanf(file, "%f", &array[0][count]) == 1) {
+        count++;
+        if (count >= STEPS) {
+            break;
+        }
+    }
+
+    fclose(file);
+
+}
+

@@ -13,7 +13,7 @@ model_path = 'lstm-ae_test.h5'
 model = tf.keras.models.load_model(model_path)
 
 # normal.txt 파일에서 데이터 읽기
-with open('../Data/normalization/normal.txt', 'r') as file: 
+with open('../Data/normalization/anormal.txt', 'r') as file: 
     data = [float(line.strip()) for line in file]
 
 # 입력 데이터를 1x128x1 형태의 배열로 변환
