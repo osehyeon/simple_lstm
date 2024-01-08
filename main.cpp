@@ -11,7 +11,7 @@ void create_file_path(char *dir, char *file_name, char *full_path);
 int main() 
 // LSTM(16,16,16,1) 모델 생성 및 실행 
 {
-    char dir_path[] = "../Weight/";
+    char dir_path[] = "./Weight/";
 
     // Define file names
     char file_name_W_1[] = "tensor_W_1_16.txt";
@@ -99,7 +99,7 @@ int main()
     tensor_B_resize(file_B_4, tensor_B_4_1, 1);
 
     // 비정상 데이터 파일의 경로를 바탕으로 입력 데이터 배열에 데이터를 저장 
-    char tensor_X_128[] = "../Data/anormal.txt"; // ../data/normal.txt 파일을 지정 시 정상 데이터일 때 추론 결과를 확인할 수 있음 
+    char tensor_X_128[] = "./Data/anormal.txt"; // ../data/normal.txt 파일을 지정 시 정상 데이터일 때 추론 결과를 확인할 수 있음 
     Tensor tensor_X = {{{0}}};
     tensor_X_resize(tensor_X_128, &tensor_X);
     
